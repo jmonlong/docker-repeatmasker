@@ -5,7 +5,6 @@ MAINTAINER jmonlong@ucsc.edu
 RUN apt-get update \
         && apt-get install -y --no-install-recommends \
         wget \
-        hmmer \
         unzip \
         gcc \ 
         build-essential \
@@ -22,9 +21,18 @@ RUN pip install --upgrade pip
 
 RUN pip install awscli
 
+RUN wget http://eddylab.org/software/hmmer/hmmer-3.2.1.tar.gz && \
+        tar -xzf hmmer-3.2.1.tar.gz && \
+        cd hmmer-3.2.1 && \
+        ./configure && \
+        make && \
+        make install && \
+        cd .. && rm -r hmmer-3.2.1 hmmer-3.2.1.tar.gz
+
 WORKDIR /usr/local/bin
 
-RUN wget http://tandem.bu.edu/trf/downloads/trf407b.linux64 && mv trf*.linux64 trf && chmod +x trf
+RUN wget http://tandem.bu.edu/trf/downloads/trf409.linux64 && \
+        mv trf*.linux64 trf && chmod +x trf
 
 WORKDIR /usr/local
 
@@ -39,7 +47,7 @@ RUN wget http://repeatmasker.org/RepeatMasker-open-4-0-9-p2.tar.gz \
 
 WORKDIR /usr/local/RepeatMasker
 
-RUN perl ./configure -trfbin=/usr/local/bin/trf -hmmerbin=/usr/bin/nhmmscan
+RUN perl ./configure -trfbin=/usr/local/bin/trf -hmmerbin=`which nhmmscan`
 
 RUN cpan Text::Soundex
 
